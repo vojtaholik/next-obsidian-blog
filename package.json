@@ -4,23 +4,33 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "watch": "ts-node src/utils/watch-vault.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@sindresorhus/slugify": "^2.2.1",
+    "chokidar": "^3.6.0",
+    "next": "14.2.0-canary.31",
+    "next-mdx-remote": "^4.4.1",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.0-canary.31"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.0-canary.31",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.0-canary.31"
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
   }
 }

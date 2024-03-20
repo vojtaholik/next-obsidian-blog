@@ -2,17 +2,14 @@ import { type Post } from './schemas'
 import { glob } from 'glob'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import slugify from '@sindresorhus/slugify'
-import fs from 'fs-extra'
 import path from 'path'
-
-const VAULT =
-  process.env.NODE_ENV === 'development'
-    ? './vault'
-    : path.join(process.cwd(), 'vault')
+import fs from 'fs/promises'
 
 export async function getPosts() {
-  const files = await glob(path.join(VAULT, '**', '*.{md,mdx}'))
-
+  const files = await glob(
+    path.join(process.cwd(), 'vault', '**', '*.{md,mdx}')
+  )
+  const pathStringToReplace = path.join(process.cwd(), 'vault')
   const posts = await Promise.all(
     files.map(async (filepath: string) => {
       const contentBuffer = await fs.readFile(filepath, 'utf8')
@@ -32,8 +29,7 @@ export async function getPosts() {
         content: await parseObsidianContent(content),
         frontmatter,
         path: filepath
-          .replace('vercel/path0/vault/', '')
-          .replace('/vault', '')
+          .replace(pathStringToReplace, '')
           .replace(`${filename}`, '')
           .split(path.sep)
           .filter(Boolean),
@@ -42,7 +38,12 @@ export async function getPosts() {
       return post
     })
   )
-  return posts as Post[]
+
+  const orderedPosts = posts.sort((a, b) => {
+    return a.path.join('/').localeCompare(b.path.join('/'))
+  })
+
+  return orderedPosts as Post[]
 }
 
 const parseObsidianContent = async (content: string) => {

@@ -41,9 +41,9 @@ const PostPage: React.FC<{
   const title = frontmatter?.title || post.title
 
   return (
-    <div>
+    <div className="w-full pt-12">
       <h1 className="text-4xl font-bold">{title}</h1>
-      <div className="prose sm:prose-lg prose-invert">
+      <div className="prose sm:prose-lg prose-invert w-full max-w-none">
         <MDXRemote
           components={{
             Grid: ({ children, className = '' }) => (
@@ -94,7 +94,7 @@ const PostPage: React.FC<{
       <div>
         Meta:
         {frontmatter?.published ? 'Published' : 'Draft'}
-        <pre>{JSON.stringify(frontmatter)}</pre>
+        {/* <pre>{JSON.stringify(frontmatter)}</pre> */}
       </div>
     </div>
   )

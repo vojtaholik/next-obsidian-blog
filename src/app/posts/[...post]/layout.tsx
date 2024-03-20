@@ -1,6 +1,7 @@
 import { getPosts } from '@/lib/posts'
 import type { Post } from '@/lib/schemas'
 import { convertPostsToNavStructure } from '@/utils/convert-posts-to-nav-structure'
+import { uniq } from 'lodash'
 import Link from 'next/link'
 import React from 'react'
 
@@ -14,9 +15,36 @@ const PostLayout: React.FC<
   //   }
   // } = await convertPostsToNavStructure()
 
+  const folders = uniq(
+    posts.flatMap((post) => {
+      return post.path
+    })
+  )
+  const postsByFolder = folders.map((folder) => {
+    return posts.filter((post) => {
+      return folder && post.path?.includes(folder)
+    })
+  })
+
+  const postsForFolder = (folder: string) => {
+    return posts.filter((post) => {
+      return folder && post.path?.includes(folder)
+    })
+  }
+
+  const navStructure = folders.map((folder) => {
+    const posts = folder && postsForFolder(folder)
+    return {
+      folder,
+      posts,
+    }
+  })
+
+  console.log({ folders })
+
   return (
-    <div className="flex gap-5 md:flex-row flex-col w-full max-w-screen-lg">
-      <aside className="max-w-[230px] w-full">
+    <div className="flex gap-5 md:flex-row flex-col w-full max-w-screen-lg relative">
+      <aside className="w-[400px] flex flex-col gap-3">
         <Link href="/">
           <svg
             className="w-8 p-1"
@@ -30,49 +58,41 @@ const PostLayout: React.FC<
             />
           </svg>
         </Link>
-        {posts && (
-          <ul>
-            {posts.map((post) => {
+        <div className="w-full">
+          {navStructure &&
+            navStructure.map((folder) => {
               return (
-                <Link
-                  href={`/posts/${post.path?.join('/')}/${post.slug}`}
-                  key={post.slug}
+                <div
+                  className="flex flex-col gap-3 mt-5 w-full"
+                  key={folder.folder}
                 >
-                  {post.title}
-                </Link>
-              )
-            })}
-          </ul>
-        )}
-        {/* {navStructure && (
-          <ul className="mt-5 flex flex-col gap-3">
-            {Object.entries(navStructure).map(([key, value]) => {
-              return (
-                <li key={key}>
-                  <strong>{key}</strong>
-                  <ul>
-                    {Object.entries(value).map(([key, value]) => {
-                      const isActive = params?.post?.includes(value.slug)
-                      return (
-                        <li key={key}>
-                          <Link
-                            className={isActive ? 'underline' : ''}
-                            href={`/posts/${value.path?.join('/')}/${value.slug}
-                        `}
-                          >
-                            {value.frontmatter?.title || value.title}
-                          </Link>
-                        </li>
-                      )
-                    })}
+                  <strong className="font-bold">{folder.folder}</strong>
+                  <ul className="flex flex-col gap-1">
+                    {folder?.posts &&
+                      folder.posts.map((post: Post) => {
+                        const isActive = params?.post?.includes(post.slug)
+                        return (
+                          <li key={post.slug} className="w-full">
+                            <Link
+                              className={`${
+                                isActive ? 'underline' : 'opacity-85'
+                              } hover:opacity-100 transition`}
+                              href={`/posts/${post.path?.join('/')}/${
+                                post.slug
+                              }`}
+                            >
+                              {post.frontmatter?.title || post.title}
+                            </Link>
+                          </li>
+                        )
+                      })}
                   </ul>
-                </li>
+                </div>
               )
             })}
-          </ul>
-        )} */}
+        </div>
       </aside>
-      <article>{children}</article>
+      <article className="w-full">{children}</article>
     </div>
   )
 }

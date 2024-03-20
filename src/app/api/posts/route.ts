@@ -7,7 +7,7 @@ import { PostSchema, type Post } from '@/lib/schemas'
 import type { NextRequest } from 'next/server'
 
 const VAULT =
-  process.env.NODE_ENV === 'development' ? './public/vault' : '/vault'
+  process.env.NODE_ENV === 'development' ? './public/vault' : './public/vault'
 
 export const GET = async (
   _: NextRequest,

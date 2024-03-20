@@ -16,7 +16,7 @@ export const GET = async (
   { params }: { params: { slug: string } }
 ) => {
   const files = glob.sync(path.join(VAULT, '**', '*.{md,mdx}'))
-
+  console.log({ files })
   const posts = await Promise.all(
     files.map(async (filepath) => {
       const contentBuffer = await fs.readFile(filepath)
@@ -43,8 +43,7 @@ export const GET = async (
           .split(path.sep)
           .filter(Boolean),
       }
-      console.log(post)
-      return post
+      console.log(post.path)
       return PostSchema.parse(post)
     })
   )

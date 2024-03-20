@@ -43,7 +43,7 @@ export const GET = async (
           .split(path.sep)
           .filter(Boolean),
       }
-      console.log(post.path)
+
       return PostSchema.parse(post)
     })
   )

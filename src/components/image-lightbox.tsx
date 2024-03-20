@@ -9,12 +9,16 @@ export const ImageLightbox: React.FC<{
   images?: (string | undefined)[]
 }> = ({ image, images }) => {
   const [open, setOpen] = React.useState(false)
+  const [index, setIndex] = React.useState(0)
 
-  const slides = images?.map((image) => ({
-    src: image as string,
-    width: 800,
-    height: 600,
-  }))
+  const slides =
+    images?.map((image) => ({
+      src: image as string,
+      width: 800,
+      height: 600,
+    })) || []
+
+  const currentImageIndex = images?.indexOf(image) || 0
 
   return (
     <>
@@ -32,6 +36,11 @@ export const ImageLightbox: React.FC<{
         alt=""
       />
       <Lightbox
+        index={index}
+        controller={{
+          closeOnBackdropClick: true,
+        }}
+        on={{ view: ({ index: currentIndex }) => setIndex(currentImageIndex) }}
         open={open}
         close={() => setOpen(false)}
         slides={slides}

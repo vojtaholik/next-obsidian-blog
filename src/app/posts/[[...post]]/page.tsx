@@ -2,11 +2,11 @@ import * as React from 'react'
 import { getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import Image from 'next/image'
+// import Image from 'next/image'
 import type { Post } from '@/lib/schemas'
-import { join } from 'path'
-import sizeOf from 'image-size'
-import { readFile } from 'fs/promises'
+// import { join } from 'path'
+// import sizeOf from 'image-size'
+// import { readFile } from 'fs/promises'
 
 const PostPage: React.FC<{
   params: {

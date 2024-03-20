@@ -27,11 +27,11 @@ const PostPage: React.FC<{
   if (!post) notFound()
 
   const frontmatter = post.frontmatter
+  const title = frontmatter?.title || post.title
 
   return (
     <div>
-      <h1 className="text-4xl font-bold">{frontmatter?.title || post.title}</h1>
-
+      <h1 className="text-4xl font-bold">{title}</h1>
       <div className="prose sm:prose-lg prose-invert">
         <MDXRemote
           components={{

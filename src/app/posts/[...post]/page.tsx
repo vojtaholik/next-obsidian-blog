@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { getPosts } from '@/lib/posts'
+import { getPost, getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 // import Image from 'next/image'
@@ -19,8 +19,10 @@ const PostPage: React.FC<{
     console.error('No posts found')
     return notFound()
   }
+  const last = params.post[params.post.length - 1] || params.post
   // create routes for each post in the vault, respecting its folder structure
-  const post = posts[0]
+  const post = await getPost(last as string)
+  console.log({ params })
   // const post = Array.isArray(params.post)
   //   ? posts.find(
   //       (post: Post) =>

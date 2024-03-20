@@ -58,7 +58,7 @@ export const GET = async (
 const parseObsidianContent = async (content: string) => {
   // replace obsidian's image markup ![[image.png]] with standard html image tag
   const imgRegex = /!\[\[(.*?)\]\]/g
-  const imgTag = `![/vault/$1](/vault/$1)`
+  const imgTag = `![/images/$1](/images/$1)`
   content = content.replace(imgRegex, imgTag)
   return content
 }

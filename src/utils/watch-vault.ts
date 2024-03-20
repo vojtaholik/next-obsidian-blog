@@ -4,7 +4,7 @@ const fs = require('fs-extra')
 
 const VAULT = '/Users/vojta/Documents/obsidian-vault'
 const DESTINATION = path.join(process.cwd(), 'vault')
-
+const IMAGES_DESTINATION = path.join(process.cwd(), 'public', 'images')
 // Initialize watcher.
 const watcher = chokidar.watch(VAULT, {
   ignored: [/(^|[\/\\])\../, '**/Untitled.md'], // ignore dotfiles and Untitled.md
@@ -17,15 +17,25 @@ const log = console.log.bind(console)
 watcher
   .on('add', async (path: string) => {
     log(`File ${path} has been added`)
+    if (path.endsWith('.png') || path.endsWith('.jpg')) {
+      await copyImageAssets(path, IMAGES_DESTINATION)
+    }
     await copyVault(VAULT, DESTINATION)
   })
   .on('change', async (path: string) => {
+    console.log({ path })
+    if (path.endsWith('.png') || path.endsWith('.jpg')) {
+      await copyImageAssets(path, IMAGES_DESTINATION)
+    }
     log(`File ${path} has been changed`)
     await copyVault(VAULT, DESTINATION)
   })
   .on('unlink', async (path: string) => {
     log(`File ${path} has been removed`)
     try {
+      if (path.endsWith('.png') || path.endsWith('.jpg')) {
+        await removeImagAsset(path, IMAGES_DESTINATION)
+      }
       log('unlinking')
       await copyVault(VAULT, DESTINATION)
     } catch (error) {
@@ -40,6 +50,28 @@ watcher
     log(`Directory ${path} has been removed`)
     await copyVault(VAULT, DESTINATION)
   })
+
+async function copyImageAssets(sourcePath: string, destinationDir: string) {
+  const filename = path.basename(sourcePath)
+  const destinationPath = path.join(destinationDir, filename)
+
+  try {
+    await fs.copy(sourcePath, destinationPath)
+  } catch (error) {
+    console.error('Error copying image assets:', error)
+  }
+}
+
+async function removeImagAsset(sourcePath: string, destinationDir: string) {
+  const filename = path.basename(sourcePath)
+  const destinationPath = path.join(destinationDir, filename)
+
+  try {
+    await fs.remove(destinationPath)
+  } catch (error) {
+    console.error('Error removing image assets:', error)
+  }
+}
 
 async function copyVault(sourceDir: string, destinationDir: string) {
   // Remove the entire destination directory

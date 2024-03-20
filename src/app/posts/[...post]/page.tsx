@@ -2,11 +2,11 @@ import * as React from 'react'
 import { getPost, getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-// import Image from 'next/image'
+import Image from 'next/image'
 import type { Post } from '@/lib/schemas'
-// import { join } from 'path'
-// import sizeOf from 'image-size'
-// import { readFile } from 'fs/promises'
+import { join } from 'path'
+import sizeOf from 'image-size'
+import { readFile } from 'fs/promises'
 
 const PostPage: React.FC<{
   params: {
@@ -52,33 +52,34 @@ const PostPage: React.FC<{
               </div>
             ),
             img: async ({ src, alt = '' }) => {
-              return null
-              // if (typeof src !== 'string') return null
-              // let imageBuffer
-              // imageBuffer = await readFile(
-              //   new URL(
-              //     join(
-              //       import.meta.url,
-              //       '..',
-              //       '..',
-              //       '..',
-              //       '..',
-              //       '..',
-              //       src
-              //     )
-              //   ).pathname
-              // )
-              // const { width, height } = sizeOf(imageBuffer)
+              // return null
+              if (typeof src !== 'string') return null
+              let imageBuffer
+              imageBuffer = await readFile(
+                new URL(
+                  join(
+                    import.meta.url,
+                    '..',
+                    '..',
+                    '..',
+                    '..',
+                    '..',
+                    'public',
+                    src
+                  )
+                ).pathname
+              )
+              const { width, height } = sizeOf(imageBuffer)
 
-              // return (
-              //   <Image
-              //     width={width}
-              //     height={height}
-              //     alt={alt}
-              //     src={src}
-              //     quality={100}
-              //   />
-              // )
+              return (
+                <Image
+                  width={width}
+                  height={height}
+                  alt={alt}
+                  src={src}
+                  quality={100}
+                />
+              )
             },
           }}
           source={post.content}

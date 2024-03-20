@@ -23,12 +23,12 @@ export const ImageLightbox: React.FC<{
         height={600}
         // width={width}
         // height={height}
-
         src={image}
         quality={100}
         onClick={() => {
           setOpen(true)
         }}
+        className="cursor-zoom-in"
         alt=""
       />
       <Lightbox

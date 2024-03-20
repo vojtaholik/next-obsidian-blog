@@ -37,6 +37,8 @@ export const GET = async (
         frontmatter,
         path: filepath
           .replace('vault/', '')
+          .replace('vercel', '')
+          .replace('path0', '')
           .replace(`${filename}`, '')
           .split(path.sep)
           .filter(Boolean),

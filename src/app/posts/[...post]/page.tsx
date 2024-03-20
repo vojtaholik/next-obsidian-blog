@@ -3,10 +3,10 @@ import { getPost, getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import Image from 'next/image'
-import type { Post } from '@/lib/schemas'
-import { join } from 'path'
-import sizeOf from 'image-size'
-import { readFile } from 'fs/promises'
+// import type { Post } from '@/lib/schemas'
+// import { join } from 'path'
+// import sizeOf from 'image-size'
+// import { readFile } from 'fs/promises'
 
 const PostPage: React.FC<{
   params: {
@@ -21,7 +21,7 @@ const PostPage: React.FC<{
   }
   const last = params.post[params.post.length - 1] || params.post
   const post = await getPost(last as string)
-  console.log({ params })
+
   // create routes for each post in the vault, respecting its folder structure
   // const post = Array.isArray(params.post)
   //   ? posts.find(
@@ -54,27 +54,29 @@ const PostPage: React.FC<{
             img: async ({ src, alt = '' }) => {
               // return null
               if (typeof src !== 'string') return null
-              let imageBuffer
-              imageBuffer = await readFile(
-                new URL(
-                  join(
-                    import.meta.url,
-                    '..',
-                    '..',
-                    '..',
-                    '..',
-                    '..',
-                    'public',
-                    src
-                  )
-                ).pathname
-              )
-              const { width, height } = sizeOf(imageBuffer)
+              // let imageBuffer
+              // imageBuffer = await readFile(
+              //   new URL(
+              //     join(
+              //       import.meta.url,
+              //       '..',
+              //       '..',
+              //       '..',
+              //       '..',
+              //       '..',
+              //       'public',
+              //       src
+              //     )
+              //   ).pathname
+              // )
+              // const { width, height } = sizeOf(imageBuffer)
 
               return (
                 <Image
-                  width={width}
-                  height={height}
+                  width={800}
+                  height={600}
+                  // width={width}
+                  // height={height}
                   alt={alt}
                   src={src}
                   quality={100}

@@ -23,7 +23,7 @@ export default async function RootLayout({
     [category: string]: {
       [slug: string]: Post
     }
-  } = posts && convertPostsToNavStructure(posts)
+  } = posts && (await convertPostsToNavStructure(posts))
 
   return (
     <html lang="en">

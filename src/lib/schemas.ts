@@ -4,6 +4,7 @@ export const PostSchema = z.object({
   slug: z.string(),
   title: z.string(),
   content: z.string(),
+  path: z.array(z.string()).optional().nullable(),
   frontmatter: z
     .object({
       title: z.string().nullable().optional(),

@@ -1,20 +1,20 @@
 import path from 'path'
 import * as fs from 'node:fs/promises'
+import * as glob from 'glob'
 import slugify from '@sindresorhus/slugify'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { PostSchema, type Post } from './schemas'
 
-const VAULT = './public/vault'
+const VAULT =
+  process.env.NODE_ENV === 'development' ? './public/vault' : '/vault'
 
 export async function getPosts() {
-  const files = await fs.readdir(VAULT)
-  const mdFiles = files.filter(
-    (file) => file.endsWith('.md') || file.endsWith('.mdx')
-  )
+  const files = glob.sync(path.join(VAULT, '**', '*.{md,mdx}'))
   return Promise.all(
-    mdFiles.map(async (filename) => {
-      const contentBuffer = await fs.readFile(path.join(VAULT, filename))
+    files.map(async (filepath) => {
+      const contentBuffer = await fs.readFile(filepath)
       const content = contentBuffer.toString()
+      const filename = path.basename(filepath)
       const title = filename.replace(/\.mdx?$/, '')
       const { frontmatter } = await compileMDX<Pick<Post, 'frontmatter'>>({
         source: content,
@@ -28,6 +28,11 @@ export async function getPosts() {
         title,
         content: await parseObsidianContent(content),
         frontmatter,
+        path: filepath
+          .replace('public/vault/', '')
+          .replace(`${filename}`, '')
+          .split(path.sep)
+          .filter(Boolean),
       }
 
       return PostSchema.parse(post)
@@ -38,7 +43,7 @@ export async function getPosts() {
 const parseObsidianContent = async (content: string) => {
   // replace ![[gitfoundations.png]] with standard html image tag
   const imgRegex = /!\[\[(.*?)\]\]/g
-  const imgTag = `<img src="/vault/$1" alt="$1" />`
+  const imgTag = `![/vault/$1](/vault/$1)`
   content = content.replace(imgRegex, imgTag)
   return content
 }

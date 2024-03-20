@@ -1,13 +1,13 @@
 const chokidar = require('chokidar')
 const path = require('path')
-const fs = require('fs').promises
+const fs = require('fs-extra')
 
 const VAULT = '/Users/vojta/Documents/obsidian-vault'
 const DESTINATION = path.join(process.cwd(), 'public', 'vault')
 
 // Initialize watcher.
 const watcher = chokidar.watch(VAULT, {
-  ignored: /(^|[\/\\])\../, // ignore dotfiles
+  ignored: [/(^|[\/\\])\../, '**/Untitled.md'], // ignore dotfiles and Untitled.md
   persistent: true,
 })
 
@@ -23,22 +23,36 @@ watcher
     log(`File ${path} has been changed`)
     await copyVault(VAULT, DESTINATION)
   })
+  .on('unlink', async (path: string) => {
+    log(`File ${path} has been removed`)
+    try {
+      log('unlinking')
+      await copyVault(VAULT, DESTINATION)
+    } catch (error) {
+      console.error('Error copying vault:', error)
+    }
+  })
+  .on('addDir', async (path: string) => {
+    log(`Directory ${path} has been added`)
+    await copyVault(VAULT, DESTINATION)
+  })
+  .on('unlinkDir', async (path: string) => {
+    log(`Directory ${path} has been removed`)
+    await copyVault(VAULT, DESTINATION)
+  })
 
 async function copyVault(sourceDir: string, destinationDir: string) {
-  await fs.mkdir(destinationDir, { recursive: true })
+  // Remove the entire destination directory
+  try {
+    await fs.remove(destinationDir)
+  } catch (error) {
+    // log('Error removing directory:', error)
+  }
 
-  const filesToCopy = await fs.readdir(sourceDir, { withFileTypes: true })
-
-  await Promise.all(
-    filesToCopy.map(async (file: any) => {
-      const sourceFile = path.join(sourceDir, file.name)
-      const destinationFile = path.join(destinationDir, file.name)
-
-      if (file.isDirectory()) {
-        return copyVault(sourceFile, destinationFile)
-      } else {
-        return fs.copyFile(sourceFile, destinationFile)
-      }
-    })
-  )
+  // Copy the entire source directory to the destination directory
+  try {
+    await fs.copy(sourceDir, destinationDir)
+  } catch (error) {
+    // log('Error copying directory:', error)
+  }
 }

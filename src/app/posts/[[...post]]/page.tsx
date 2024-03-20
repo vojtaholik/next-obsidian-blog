@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { join } from 'path'
 import sizeOf from 'image-size'
 import { readFile } from 'fs/promises'
+import type { Post } from '@/lib/schemas'
 
 const PostPage: React.FC<{
   params: {
@@ -16,7 +17,7 @@ const PostPage: React.FC<{
   // create routes for each post in the vault, respecting its folder structure
   const post = Array.isArray(params.post)
     ? posts.find(
-        (post) =>
+        (post: Post) =>
           post.slug === params.post[params.post.length - 1] &&
           post.path?.join('/') ===
             (params.post.slice(0, -1) as string[]).join('/')
@@ -58,7 +59,7 @@ const PostPage: React.FC<{
                 ).pathname
               )
               const { width, height } = sizeOf(imageBuffer)
-              console.log({ width, height })
+
               return (
                 <Image
                   width={width}

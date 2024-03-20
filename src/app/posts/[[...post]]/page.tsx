@@ -47,33 +47,33 @@ const PostPage: React.FC<{
               </div>
             ),
             img: async ({ src, alt = '' }) => {
-              if (typeof src !== 'string') return null
-              let imageBuffer
-              imageBuffer = await readFile(
-                new URL(
-                  join(
-                    import.meta.url,
-                    '..',
-                    '..',
-                    '..',
-                    '..',
-                    '..',
-                    'public',
-                    src
-                  )
-                ).pathname
-              )
-              const { width, height } = sizeOf(imageBuffer)
+              return null
+              // if (typeof src !== 'string') return null
+              // let imageBuffer
+              // imageBuffer = await readFile(
+              //   new URL(
+              //     join(
+              //       import.meta.url,
+              //       '..',
+              //       '..',
+              //       '..',
+              //       '..',
+              //       '..',
+              //       src
+              //     )
+              //   ).pathname
+              // )
+              // const { width, height } = sizeOf(imageBuffer)
 
-              return (
-                <Image
-                  width={width}
-                  height={height}
-                  alt={alt}
-                  src={src}
-                  quality={100}
-                />
-              )
+              // return (
+              //   <Image
+              //     width={width}
+              //     height={height}
+              //     alt={alt}
+              //     src={src}
+              //     quality={100}
+              //   />
+              // )
             },
           }}
           source={post.content}

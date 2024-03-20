@@ -8,8 +8,8 @@ import type { NextRequest } from 'next/server'
 
 const VAULT =
   process.env.NODE_ENV === 'development'
-    ? './public/vault'
-    : path.join(process.cwd(), 'public/vault')
+    ? './vault'
+    : path.join(process.cwd(), 'vault')
 
 export const GET = async (
   _: NextRequest,

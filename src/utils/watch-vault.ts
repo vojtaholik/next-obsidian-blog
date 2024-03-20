@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs-extra')
 
 const VAULT = '/Users/vojta/Documents/obsidian-vault'
-const DESTINATION = path.join(process.cwd(), 'public', 'vault')
+const DESTINATION = path.join(process.cwd(), 'vault')
 
 // Initialize watcher.
 const watcher = chokidar.watch(VAULT, {

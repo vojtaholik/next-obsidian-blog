@@ -18,12 +18,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  let posts
-  try {
-    posts = await getPosts()
-  } catch (error) {
-    console.error(error)
-  }
+  const posts = await getPosts()
   const navStructure: {
     [category: string]: {
       [slug: string]: Post

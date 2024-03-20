@@ -1,11 +1,12 @@
+import * as React from 'react'
 import { getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import Image from 'next/image'
+import type { Post } from '@/lib/schemas'
 import { join } from 'path'
 import sizeOf from 'image-size'
 import { readFile } from 'fs/promises'
-import type { Post } from '@/lib/schemas'
 
 const PostPage: React.FC<{
   params: {
@@ -14,6 +15,9 @@ const PostPage: React.FC<{
 }> = async ({ params }) => {
   const posts = await getPosts()
 
+  if (!posts) {
+    return notFound()
+  }
   // create routes for each post in the vault, respecting its folder structure
   const post = Array.isArray(params.post)
     ? posts.find(
@@ -24,7 +28,9 @@ const PostPage: React.FC<{
       )
     : posts.find((post: Post) => post.slug === params.post)
 
-  if (!post) notFound()
+  if (!post) {
+    return notFound()
+  }
 
   const frontmatter = post.frontmatter
   const title = frontmatter?.title || post.title

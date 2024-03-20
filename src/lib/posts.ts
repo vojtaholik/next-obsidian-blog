@@ -2,7 +2,7 @@ import { getBaseUrl } from '@/utils/get-base-url'
 
 export async function getPosts() {
   try {
-    const posts = await fetch(`${getBaseUrl()}/api/posts`, {
+    const posts = await fetch(`/api/posts`, {
       method: 'GET',
     }).then((res) => res.json())
     console.log({ posts })

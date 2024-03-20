@@ -14,6 +14,7 @@ export const GET = async (
   { params }: { params: { slug: string } }
 ) => {
   const files = glob.sync(path.join(VAULT, '**', '*.{md,mdx}'))
+
   const posts = await Promise.all(
     files.map(async (filepath) => {
       const contentBuffer = await fs.readFile(filepath)

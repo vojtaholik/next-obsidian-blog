@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
 import { IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
-import { getPosts } from '@/lib/posts'
-import type { Post } from '@/lib/schemas'
-import { convertPostsToNavStructure } from '@/utils/convert-posts-to-nav-structure'
 
 const PlexMono = IBM_Plex_Mono({
   weight: ['400', '700'],
@@ -21,13 +18,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const posts = await getPosts()
-  const navStructure: {
-    [category: string]: {
-      [slug: string]: Post
-    }
-  } = posts && (await convertPostsToNavStructure(posts))
-
   return (
     <html lang="en">
       <body className={`${PlexMono.className} overflow-y-scroll`}>

@@ -1,12 +1,15 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { getPosts } from '@/lib/posts'
 import type { Post } from '@/lib/schemas'
 import { convertPostsToNavStructure } from '@/utils/convert-posts-to-nav-structure'
-import Link from 'next/link'
 
-const inter = Inter({ subsets: ['latin'] })
+const PlexMono = IBM_Plex_Mono({
+  weight: ['400', '700'],
+  display: 'swap',
+  subsets: ['latin'],
+})
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -27,41 +30,8 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <main className="flex gap-5 md:flex-row flex-col w-full max-w-screen-lg">
-          {posts && (
-            <aside>
-              {navStructure && (
-                <ul>
-                  {Object.entries(navStructure).map(([key, value]) => {
-                    return (
-                      <li key={key}>
-                        <strong>{key}</strong>
-                        <ul>
-                          {Object.entries(value).map(([key, value]) => {
-                            return (
-                              <li key={key}>
-                                <Link
-                                  href={`/posts/${value.path?.join('/')}/${
-                                    value.slug
-                                  }
-                        `}
-                                >
-                                  {value.frontmatter?.title || value.title}
-                                </Link>
-                              </li>
-                            )
-                          })}
-                        </ul>
-                      </li>
-                    )
-                  })}
-                </ul>
-              )}
-            </aside>
-          )}
-          <article>{children}</article>
-        </main>
+      <body className={`${PlexMono.className} overflow-y-scroll`}>
+        <main className="p-5 mx-auto w-full max-w-screen-lg">{children}</main>
       </body>
     </html>
   )

@@ -18,46 +18,53 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const posts = await getPosts()
+  let posts
+  try {
+    posts = await getPosts()
+  } catch (error) {
+    console.error(error)
+  }
   const navStructure: {
     [category: string]: {
       [slug: string]: Post
     }
-  } = convertPostsToNavStructure(posts)
+  } = posts && convertPostsToNavStructure(posts)
 
   return (
     <html lang="en">
       <body className={inter.className}>
         <main className="flex gap-5 md:flex-row flex-col w-full max-w-screen-lg">
-          <aside>
-            {navStructure && (
-              <ul>
-                {Object.entries(navStructure).map(([key, value]) => {
-                  return (
-                    <li key={key}>
-                      <strong>{key}</strong>
-                      <ul>
-                        {Object.entries(value).map(([key, value]) => {
-                          return (
-                            <li key={key}>
-                              <Link
-                                href={`/posts/${value.path?.join('/')}/${
-                                  value.slug
-                                }
+          {posts && (
+            <aside>
+              {navStructure && (
+                <ul>
+                  {Object.entries(navStructure).map(([key, value]) => {
+                    return (
+                      <li key={key}>
+                        <strong>{key}</strong>
+                        <ul>
+                          {Object.entries(value).map(([key, value]) => {
+                            return (
+                              <li key={key}>
+                                <Link
+                                  href={`/posts/${value.path?.join('/')}/${
+                                    value.slug
+                                  }
                         `}
-                              >
-                                {value.frontmatter?.title || value.title}
-                              </Link>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </aside>
+                                >
+                                  {value.frontmatter?.title || value.title}
+                                </Link>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </aside>
+          )}
           <article>{children}</article>
         </main>
       </body>

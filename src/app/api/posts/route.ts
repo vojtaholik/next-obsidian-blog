@@ -36,12 +36,13 @@ export const GET = async (
         content: await parseObsidianContent(content),
         frontmatter,
         path: filepath
-          .replace('public/vault/', '')
+          .replace('vault/', '')
           .replace(`${filename}`, '')
           .split(path.sep)
           .filter(Boolean),
       }
-
+      console.log(post)
+      return post
       return PostSchema.parse(post)
     })
   )

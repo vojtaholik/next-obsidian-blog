@@ -20,14 +20,15 @@ const PostPage: React.FC<{
     return notFound()
   }
   // create routes for each post in the vault, respecting its folder structure
-  const post = Array.isArray(params.post)
-    ? posts.find(
-        (post: Post) =>
-          post.slug === params.post[params.post.length - 1] &&
-          post.path?.join('/') ===
-            (params.post.slice(0, -1) as string[]).join('/')
-      )
-    : posts.find((post: Post) => post.slug === params.post)
+  const post = posts[0]
+  // const post = Array.isArray(params.post)
+  //   ? posts.find(
+  //       (post: Post) =>
+  //         post.slug === params.post[params.post.length - 1] &&
+  //         post.path?.join('/') ===
+  //           (params.post.slice(0, -1) as string[]).join('/')
+  //     )
+  //   : posts.find((post: Post) => post.slug === params.post)
 
   if (!post) {
     console.error('No post found')

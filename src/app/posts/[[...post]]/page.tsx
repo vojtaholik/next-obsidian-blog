@@ -22,7 +22,7 @@ const PostPage: React.FC<{
           post.path?.join('/') ===
             (params.post.slice(0, -1) as string[]).join('/')
       )
-    : posts.find((post) => post.slug === params.post)
+    : posts.find((post: Post) => post.slug === params.post)
 
   if (!post) notFound()
 

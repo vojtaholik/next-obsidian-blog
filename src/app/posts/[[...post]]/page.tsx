@@ -2,6 +2,9 @@ import { getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import Image from 'next/image'
+import { join } from 'path'
+import sizeOf from 'image-size'
+import { readFile } from 'fs/promises'
 
 const PostPage: React.FC<{
   params: {
@@ -31,19 +34,40 @@ const PostPage: React.FC<{
       <div className="prose sm:prose-lg prose-invert">
         <MDXRemote
           components={{
-            // custom components
-            img: ({ src, alt = '' }) => {
+            Grid: ({ children, className = '' }) => (
+              <div className={`grid grid-cols-2 gap-5 ${className}`}>
+                {children.props.children}
+              </div>
+            ),
+            img: async ({ src, alt = '' }) => {
               console.log({ src })
-              return src ? (
+              if (typeof src !== 'string') return null
+              let imageBuffer
+              imageBuffer = await readFile(
+                new URL(
+                  join(
+                    import.meta.url,
+                    '..',
+                    '..',
+                    '..',
+                    '..',
+                    '..',
+                    'public',
+                    src
+                  )
+                ).pathname
+              )
+              const { width, height } = sizeOf(imageBuffer)
+              console.log({ width, height })
+              return (
                 <Image
-                  width="800"
-                  height="600"
+                  width={width}
+                  height={height}
                   alt={alt}
                   src={src}
                   quality={100}
-                  className="aspect-video"
                 />
-              ) : null
+              )
             },
           }}
           source={post.content}

@@ -7,7 +7,9 @@ import { PostSchema, type Post } from '@/lib/schemas'
 import type { NextRequest } from 'next/server'
 
 const VAULT =
-  process.env.NODE_ENV === 'development' ? './public/vault' : './public/vault'
+  process.env.NODE_ENV === 'development'
+    ? './public/vault'
+    : `${process.env.VERCEL_URL}/vault`
 
 export const GET = async (
   _: NextRequest,

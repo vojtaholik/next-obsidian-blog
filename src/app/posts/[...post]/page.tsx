@@ -21,7 +21,7 @@ const PostPage: React.FC<{
   }
   const last = params.post[params.post.length - 1] || params.post
   // create routes for each post in the vault, respecting its folder structure
-  const post = await getPost(last as string)
+  const post = await getPost(last as string, params)
   console.log({ params })
   // const post = Array.isArray(params.post)
   //   ? posts.find(

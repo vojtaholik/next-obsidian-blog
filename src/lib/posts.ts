@@ -24,7 +24,20 @@ export async function getPost(
     return null
   }
 
-  const post = posts.find((post: Post) => post.slug === slug)
+  // const post = posts.find((post: Post) => post.slug === slug)
+  if (!params) {
+    const post = posts.find((post: Post) => post.slug === slug)
+    return post
+  } else {
+    const post = Array.isArray(params.post)
+      ? posts.find(
+          (post: Post) =>
+            post.slug === params.post[params.post.length - 1] &&
+            post.path?.join('/') ===
+              (params.post.slice(0, -1) as string[]).join('/')
+        )
+      : posts.find((post: Post) => post.slug === params.post)
 
-  return post
+    return post
+  }
 }

@@ -1,5 +1,5 @@
 import { getBaseUrl } from '@/utils/get-base-url'
-import type { Post } from './schemas'
+import { PostSchema, type Post } from './schemas'
 
 export async function getPosts() {
   try {
@@ -7,7 +7,7 @@ export async function getPosts() {
       method: 'GET',
     }).then((res) => res.json())
     // console.log({ posts })
-    return posts
+    return posts as Post[]
   } catch (error) {
     console.error(error)
     return []

@@ -1,3 +1,4 @@
+import { getPosts } from '@/lib/posts'
 import type { Post } from '@/lib/schemas'
 import { convertPostsToNavStructure } from '@/utils/convert-posts-to-nav-structure'
 import Link from 'next/link'
@@ -6,11 +7,12 @@ import React from 'react'
 const PostLayout: React.FC<
   React.PropsWithChildren<{ params: { post: string | string[] } }>
 > = async ({ children, params }) => {
-  const navStructure: {
-    [category: string]: {
-      [slug: string]: Post
-    }
-  } = await convertPostsToNavStructure()
+  const posts = await getPosts()
+  // const navStructure: {
+  //   [category: string]: {
+  //     [slug: string]: Post
+  //   }
+  // } = await convertPostsToNavStructure()
 
   return (
     <div className="flex gap-5 md:flex-row flex-col w-full max-w-screen-lg">
@@ -28,7 +30,21 @@ const PostLayout: React.FC<
             />
           </svg>
         </Link>
-        {navStructure && (
+        {posts && (
+          <ul>
+            {posts.map((post) => {
+              return (
+                <Link
+                  href={`/posts/${post.path?.join('/')}/${post.slug}`}
+                  key={post.slug}
+                >
+                  {post.title}
+                </Link>
+              )
+            })}
+          </ul>
+        )}
+        {/* {navStructure && (
           <ul className="mt-5 flex flex-col gap-3">
             {Object.entries(navStructure).map(([key, value]) => {
               return (
@@ -54,7 +70,7 @@ const PostLayout: React.FC<
               )
             })}
           </ul>
-        )}
+        )} */}
       </aside>
       <article>{children}</article>
     </div>

@@ -1,4 +1,3 @@
-'use server'
 import { getPosts } from '@/lib/posts'
 import type { Post } from '@/lib/schemas'
 

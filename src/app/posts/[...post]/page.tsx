@@ -53,6 +53,7 @@ const PostPage: React.FC<{
             ),
             img: async ({ src, alt = '' }) => {
               // return null
+              console.log({ src })
               if (typeof src !== 'string') return null
               // let imageBuffer
               // imageBuffer = await readFile(

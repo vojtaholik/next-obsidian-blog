@@ -44,7 +44,7 @@ export const GET = async (
           .filter(Boolean),
       }
 
-      return PostSchema.parse(post)
+      return post
     })
   )
   return new Response(JSON.stringify(posts), {

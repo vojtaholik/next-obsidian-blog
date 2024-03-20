@@ -3,6 +3,7 @@ import { getPost, getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import Image from 'next/image'
+import { ImageLightbox } from '@/components/image-lightbox'
 // import type { Post } from '@/lib/schemas'
 // import { join } from 'path'
 // import sizeOf from 'image-size'
@@ -40,6 +41,11 @@ const PostPage: React.FC<{
   const frontmatter = post.frontmatter
   const title = frontmatter?.title || post.title
 
+  const imageUrlsFromPost = post.content
+    .match(/!\[.*?\]\((.*?)\)/g)
+    ?.map((match) => match.match(/!\[.*?\]\((.*?)\)/)?.[1])
+
+  console.log({ imageUrlsFromPost })
   return (
     <div className="w-full pt-12">
       <h1 className="text-4xl font-bold">{title}</h1>
@@ -73,15 +79,16 @@ const PostPage: React.FC<{
               // const { width, height } = sizeOf(imageBuffer)
 
               return (
-                <Image
-                  width={800}
-                  height={600}
-                  // width={width}
-                  // height={height}
-                  alt={alt}
-                  src={src}
-                  quality={100}
-                />
+                <ImageLightbox image={src} images={imageUrlsFromPost} />
+                // <Image
+                //   width={800}
+                //   height={600}
+                //   // width={width}
+                //   // height={height}
+                //   alt={alt}
+                //   src={src}
+                //   quality={100}
+                // />
               )
             },
           }}

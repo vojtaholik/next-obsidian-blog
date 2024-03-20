@@ -16,6 +16,7 @@ const PostPage: React.FC<{
   const posts = await getPosts()
 
   if (!posts) {
+    console.error('No posts found')
     return notFound()
   }
   // create routes for each post in the vault, respecting its folder structure
@@ -29,6 +30,7 @@ const PostPage: React.FC<{
     : posts.find((post: Post) => post.slug === params.post)
 
   if (!post) {
+    console.error('No post found')
     return notFound()
   }
 

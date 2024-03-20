@@ -1,17 +1,56 @@
-import { getBaseUrl } from '@/utils/get-base-url'
-import { PostSchema, type Post } from './schemas'
+import { type Post } from './schemas'
+import { glob } from 'glob'
+import { compileMDX } from 'next-mdx-remote/rsc'
+import slugify from '@sindresorhus/slugify'
+import fs from 'fs-extra'
+import path from 'path'
+
+const VAULT =
+  process.env.NODE_ENV === 'development'
+    ? './vault'
+    : path.join(process.cwd(), 'vault')
 
 export async function getPosts() {
-  try {
-    const posts = await fetch(`${getBaseUrl()}/api/posts`, {
-      method: 'GET',
-    }).then((res) => res.json())
-    // console.log({ posts })
-    return posts as Post[]
-  } catch (error) {
-    console.error(error)
-    return []
-  }
+  const files = await glob(path.join(VAULT, '**', '*.{md,mdx}'))
+
+  const posts = await Promise.all(
+    files.map(async (filepath: string) => {
+      const contentBuffer = await fs.readFile(filepath, 'utf8')
+      const content = contentBuffer.toString()
+      const filename = path.basename(filepath)
+      const title = filename.replace(/\.mdx?$/, '')
+      const { frontmatter } = await compileMDX<Pick<Post, 'frontmatter'>>({
+        source: content,
+        options: {
+          parseFrontmatter: true,
+        },
+      })
+
+      const post = {
+        slug: slugify(title),
+        title,
+        content: await parseObsidianContent(content),
+        frontmatter,
+        path: filepath
+          .replace('vercel/path0/vault/', '')
+          .replace('/vault', '')
+          .replace(`${filename}`, '')
+          .split(path.sep)
+          .filter(Boolean),
+      }
+
+      return post
+    })
+  )
+  return posts as Post[]
+}
+
+const parseObsidianContent = async (content: string) => {
+  // replace obsidian's image markup ![[image.png]] with standard html image tag
+  const imgRegex = /!\[\[(.*?)\]\]/g
+  const imgTag = `![/images/$1](/images/$1)`
+  content = content.replace(imgRegex, imgTag)
+  return content
 }
 
 export async function getPost(
@@ -26,7 +65,7 @@ export async function getPost(
 
   // const post = posts.find((post: Post) => post.slug === slug)
   if (!params) {
-    const post = posts.find((post: Post) => post.slug === slug)
+    const post = posts.find((post) => post.slug === slug)
     return post
   } else {
     const post = Array.isArray(params.post)
@@ -36,7 +75,7 @@ export async function getPost(
             post.path?.join('/') ===
               (params.post.slice(0, -1) as string[]).join('/')
         )
-      : posts.find((post: Post) => post.slug === params.post)
+      : posts.find((post) => post.slug === params.post)
 
     return post
   }

@@ -53,36 +53,15 @@ const PostPage: React.FC<{
               if (typeof src !== 'string') return null
               const imageDir = path.join(process.cwd(), 'public', src)
               const imageBuffer = await readFile(imageDir)
-              const dimensions = sizeOf(imageBuffer)
-              console.log(dimensions)
-              // let imageBuffer
-              // imageBuffer = await readFile(
-              //   new URL(
-              //     join(
-              //       import.meta.url,
-              //       '..',
-              //       '..',
-              //       '..',
-              //       '..',
-              //       '..',
-              //       'public',
-              //       src
-              //     )
-              //   ).pathname
-              // )
-              // const { width, height } = sizeOf(imageBuffer)
+              const { width, height } = sizeOf(imageBuffer)
 
               return (
-                <ImageLightbox image={src} images={imageUrlsFromPost} />
-                // <Image
-                //   width={800}
-                //   height={600}
-                //   // width={width}
-                //   // height={height}
-                //   alt={alt}
-                //   src={src}
-                //   quality={100}
-                // />
+                <ImageLightbox
+                  width={width}
+                  height={height}
+                  image={src}
+                  images={imageUrlsFromPost}
+                />
               )
             },
           }}

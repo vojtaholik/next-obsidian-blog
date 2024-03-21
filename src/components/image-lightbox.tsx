@@ -7,7 +7,9 @@ import Lightbox from 'yet-another-react-lightbox'
 export const ImageLightbox: React.FC<{
   image: string
   images?: (string | undefined)[]
-}> = ({ image, images }) => {
+  width?: number
+  height?: number
+}> = ({ image, images, width, height }) => {
   const [open, setOpen] = React.useState(false)
   const [index, setIndex] = React.useState(0)
 
@@ -23,10 +25,8 @@ export const ImageLightbox: React.FC<{
   return (
     <>
       <Image
-        width={800}
-        height={600}
-        // width={width}
-        // height={height}
+        width={width}
+        height={height}
         src={image}
         quality={100}
         onClick={() => {

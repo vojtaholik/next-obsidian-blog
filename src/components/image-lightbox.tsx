@@ -6,27 +6,33 @@ import Lightbox from 'yet-another-react-lightbox'
 
 export const ImageLightbox: React.FC<{
   image: string
-  images?: (string | undefined)[]
-  width?: number
-  height?: number
+  images?: {
+    src: string
+    width: string
+    height: string
+  }[]
+  width: string
+  height: string
 }> = ({ image, images, width, height }) => {
   const [open, setOpen] = React.useState(false)
   const [index, setIndex] = React.useState(0)
 
-  const slides =
-    images?.map((image) => ({
-      src: image as string,
-      width: 800,
-      height: 600,
-    })) || []
+  const slides = images?.map((image) => ({
+    src: image.src,
+    width: Number(image.width),
+    height: Number(image.height),
+  }))
 
-  const currentImageIndex = images?.indexOf(image) || 0
+  const currentImageIndex =
+    slides?.findIndex((slide) => {
+      return slide.src === image
+    }) || 0
 
   return (
     <>
       <Image
-        width={width}
-        height={height}
+        width={Number(width)}
+        height={Number(height)}
         src={image}
         quality={100}
         onClick={() => {
@@ -37,23 +43,31 @@ export const ImageLightbox: React.FC<{
       />
       <Lightbox
         index={index}
+        on={{
+          view: ({ index: currentIndex }) => {
+            setIndex(currentImageIndex)
+          },
+        }}
         controller={{
           closeOnBackdropClick: true,
         }}
-        on={{ view: ({ index: currentIndex }) => setIndex(currentImageIndex) }}
         open={open}
         close={() => setOpen(false)}
         slides={slides}
-        render={{ slide: Slide }}
+        render={{
+          slide: (props) => {
+            return (
+              <Image
+                {...props}
+                alt=""
+                src={props.slide.src}
+                width={Number(width)}
+                height={Number(height)}
+              />
+            )
+          },
+        }}
       />
     </>
-  )
-}
-
-const Slide: React.FC<any> = ({ slide, rect, setOpen }) => {
-  return (
-    <div>
-      <Image alt="" src={slide} />
-    </div>
   )
 }

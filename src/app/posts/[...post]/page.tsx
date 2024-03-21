@@ -36,6 +36,19 @@ const PostPage: React.FC<{
     .match(/!\[.*?\]\((.*?)\)/g)
     ?.map((match) => match.match(/!\[.*?\]\((.*?)\)/)?.[1])
 
+  const imagesWithDimensions = imageUrlsFromPost?.map(async (image) => {
+    const imageDir = path.join(process.cwd(), 'public', image as string)
+    const imageBuffer = await readFile(imageDir)
+    const { width, height } = sizeOf(imageBuffer)
+    return {
+      src: image,
+      width: width,
+      height: height,
+    }
+  })
+  const imagesInPost =
+    imagesWithDimensions && (await Promise.all(imagesWithDimensions))
+
   return (
     <div className="w-full pt-12">
       <h1 className="text-4xl font-bold">{title}</h1>
@@ -57,10 +70,10 @@ const PostPage: React.FC<{
 
               return (
                 <ImageLightbox
-                  width={width}
-                  height={height}
+                  width={width?.toString() || '800'}
+                  height={height?.toString() || '600'}
                   image={src}
-                  images={imageUrlsFromPost}
+                  images={imagesInPost as any}
                 />
               )
             },

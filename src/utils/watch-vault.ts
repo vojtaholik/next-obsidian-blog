@@ -23,7 +23,6 @@ watcher
     await copyVault(VAULT, DESTINATION)
   })
   .on('change', async (path: string) => {
-    console.log({ path })
     if (path.endsWith('.png') || path.endsWith('.jpg')) {
       await copyImageAssets(path, IMAGES_DESTINATION)
     }
@@ -34,7 +33,7 @@ watcher
     log(`File ${path} has been removed`)
     try {
       if (path.endsWith('.png') || path.endsWith('.jpg')) {
-        await removeImagAsset(path, IMAGES_DESTINATION)
+        await removeImageAsset(path, IMAGES_DESTINATION)
       }
       log('unlinking')
       await copyVault(VAULT, DESTINATION)
@@ -62,7 +61,7 @@ async function copyImageAssets(sourcePath: string, destinationDir: string) {
   }
 }
 
-async function removeImagAsset(sourcePath: string, destinationDir: string) {
+async function removeImageAsset(sourcePath: string, destinationDir: string) {
   const filename = path.basename(sourcePath)
   const destinationPath = path.join(destinationDir, filename)
 
@@ -84,7 +83,29 @@ async function copyVault(sourceDir: string, destinationDir: string) {
   // Copy the entire source directory to the destination directory
   try {
     await fs.copy(sourceDir, destinationDir)
+    await removeImagesFromVault()
   } catch (error) {
     // log('Error copying directory:', error)
+  }
+}
+
+async function removeImagesFromVault() {
+  try {
+    // because we're moving them over to the public/images directory
+    // we can remove them from the destination directory
+    const files = await fs.readdir(DESTINATION)
+    const imageFiles = files.filter((file: string) => {
+      return file.endsWith('.png') || file.endsWith('.jpg')
+    })
+    await Promise.all(
+      imageFiles.map(async (file: string) => {
+        const filePath = path.join(DESTINATION, file)
+        await fs.remove(filePath)
+
+        log(`File ${filePath} has been removed`)
+      })
+    )
+  } catch (error) {
+    console.error('Error removing image assets:', error)
   }
 }

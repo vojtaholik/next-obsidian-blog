@@ -5,9 +5,10 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import Image from 'next/image'
 import { ImageLightbox } from '@/components/image-lightbox'
 // import type { Post } from '@/lib/schemas'
+import path from 'path'
 // import { join } from 'path'
-// import sizeOf from 'image-size'
-// import { readFile } from 'fs/promises'
+import sizeOf from 'image-size'
+import { readFile } from 'fs/promises'
 
 const PostPage: React.FC<{
   params: {
@@ -23,16 +24,6 @@ const PostPage: React.FC<{
   const last = params.post[params.post.length - 1] || params.post
   const post = await getPost(last as string)
 
-  // create routes for each post in the vault, respecting its folder structure
-  // const post = Array.isArray(params.post)
-  //   ? posts.find(
-  //       (post: Post) =>
-  //         post.slug === params.post[params.post.length - 1] &&
-  //         post.path?.join('/') ===
-  //           (params.post.slice(0, -1) as string[]).join('/')
-  //     )
-  //   : posts.find((post: Post) => post.slug === params.post)
-
   if (!post) {
     console.error('No post found')
     return notFound()
@@ -45,7 +36,6 @@ const PostPage: React.FC<{
     .match(/!\[.*?\]\((.*?)\)/g)
     ?.map((match) => match.match(/!\[.*?\]\((.*?)\)/)?.[1])
 
-  console.log({ imageUrlsFromPost })
   return (
     <div className="w-full pt-12">
       <h1 className="text-4xl font-bold">{title}</h1>
@@ -59,8 +49,12 @@ const PostPage: React.FC<{
             ),
             img: async ({ src, alt = '' }) => {
               // return null
-              console.log({ src })
+
               if (typeof src !== 'string') return null
+              const imageDir = path.join(process.cwd(), 'public', src)
+              const imageBuffer = await readFile(imageDir)
+              const dimensions = sizeOf(imageBuffer)
+              console.log(dimensions)
               // let imageBuffer
               // imageBuffer = await readFile(
               //   new URL(

@@ -40,8 +40,6 @@ const PostLayout: React.FC<
     }
   })
 
-  console.log({ folders })
-
   return (
     <div className="flex gap-5 md:flex-row flex-col w-full max-w-screen-lg relative">
       <aside className="w-[400px] flex flex-col gap-3">

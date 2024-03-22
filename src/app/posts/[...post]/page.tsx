@@ -2,13 +2,28 @@ import * as React from 'react'
 import { getPost, getPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import Image from 'next/image'
 import { ImageLightbox } from '@/components/image-lightbox'
-// import type { Post } from '@/lib/schemas'
 import path from 'path'
-// import { join } from 'path'
 import sizeOf from 'image-size'
 import { readFile } from 'fs/promises'
+import type { Props, ScriptProps } from 'next/script'
+import type { Metadata, ResolvingMetadata } from 'next'
+
+export async function generateMetadata(
+  { params }: { params: { post: string | string[] } },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const slug = params.post[params.post.length - 1] || params.post
+  const post = await getPost(slug as string)
+
+  if (!post) {
+    return parent as Metadata
+  }
+
+  return {
+    title: post?.frontmatter?.title || post.title,
+  }
+}
 
 const PostPage: React.FC<{
   params: {
@@ -21,8 +36,8 @@ const PostPage: React.FC<{
     console.error('No posts found')
     return notFound()
   }
-  const last = params.post[params.post.length - 1] || params.post
-  const post = await getPost(last as string)
+  const slug = params.post[params.post.length - 1] || params.post
+  const post = await getPost(slug as string)
 
   if (!post) {
     console.error('No post found')
@@ -33,7 +48,7 @@ const PostPage: React.FC<{
   const title = frontmatter?.title || post.title
 
   const imageUrlsFromPost = post.content
-    .match(/!\[.*?\]\((.*?)\)/g)
+    ?.match(/!\[.*?\]\((.*?)\)/g)
     ?.map((match) => match.match(/!\[.*?\]\((.*?)\)/)?.[1])
 
   const imagesWithDimensions = imageUrlsFromPost?.map(async (image) => {
@@ -52,7 +67,7 @@ const PostPage: React.FC<{
   return (
     <div className="w-full pt-12">
       <h1 className="text-4xl font-bold">{title}</h1>
-      <div className="prose sm:prose-lg prose-invert w-full max-w-none">
+      <div className="prose sm:prose-lg prose-invert w-full max-w-none py-8">
         <MDXRemote
           components={{
             Grid: ({ children, className = '' }) => (
@@ -83,11 +98,6 @@ const PostPage: React.FC<{
             parseFrontmatter: true,
           }}
         />
-      </div>
-      <div>
-        Meta:
-        {frontmatter?.published ? 'Published' : 'Draft'}
-        {/* <pre>{JSON.stringify(frontmatter)}</pre> */}
       </div>
     </div>
   )

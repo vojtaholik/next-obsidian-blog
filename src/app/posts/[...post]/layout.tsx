@@ -1,47 +1,62 @@
 import { getPosts } from '@/lib/posts'
 import type { Post } from '@/lib/schemas'
-import { convertPostsToNavStructure } from '@/utils/convert-posts-to-nav-structure'
 import { uniq } from 'lodash'
 import Link from 'next/link'
 import React from 'react'
+
+type TreeNode = {
+  name: string
+  children: Map<string, TreeNode>
+  posts: Post[]
+}
+
+const buildTree = (posts: Post[]): TreeNode => {
+  const root: TreeNode = { name: 'root', children: new Map(), posts: [] }
+
+  posts.forEach((post) => {
+    let currentNode = root
+    let currentPath = '' // Initialize the current path
+    post?.path?.forEach((pathName, index) => {
+      // Update the current path as you go deeper
+      currentPath += `${pathName}/`
+      if (!currentNode.children.has(pathName)) {
+        currentNode.children.set(pathName, {
+          name: pathName,
+          children: new Map(),
+          posts: [],
+        })
+      }
+      currentNode = currentNode.children.get(pathName)!
+    })
+    // Set fullPath for the post
+    // Trim trailing slash for consistency if preferred
+    post.path = [`/${currentPath}${post.slug}`.replace(/\/$/, '')]
+    currentNode.posts.push(post)
+  })
+
+  return root
+}
+
+// Conversion function to object for easier visualization
+const treeNodeToObject = (node: TreeNode): any => {
+  return {
+    name: node.name,
+    children: Array.from(node.children.values()).map((child) =>
+      treeNodeToObject(child)
+    ),
+    posts: node.posts.map((post) => post.title), // Showing titles for simplicity
+  }
+}
 
 const PostLayout: React.FC<
   React.PropsWithChildren<{ params: { post: string | string[] } }>
 > = async ({ children, params }) => {
   const posts = await getPosts()
-  // const navStructure: {
-  //   [category: string]: {
-  //     [slug: string]: Post
-  //   }
-  // } = await convertPostsToNavStructure()
-
-  const folders = uniq(
-    posts.flatMap((post) => {
-      return post.path
-    })
-  )
-  const postsByFolder = folders.map((folder) => {
-    return posts.filter((post) => {
-      return folder && post.path?.includes(folder)
-    })
-  })
-
-  const postsForFolder = (folder: string) => {
-    return posts.filter((post) => {
-      return folder && post.path?.includes(folder)
-    })
-  }
-
-  const navStructure = folders.map((folder) => {
-    const posts = folder && postsForFolder(folder)
-    return {
-      folder,
-      posts,
-    }
-  })
+  const navStructure = buildTree(posts)
 
   return (
     <div className="flex gap-5 md:flex-row flex-col w-full max-w-screen-lg relative">
+      {/* <pre>{JSON.stringify(posts.slice(0, 3))}</pre> */}
       <aside className="w-[400px] flex flex-col gap-3">
         <Link href="/">
           <svg
@@ -57,40 +72,68 @@ const PostLayout: React.FC<
           </svg>
         </Link>
         <div className="w-full">
-          {navStructure &&
-            navStructure.map((folder) => {
-              return (
-                <div
-                  className="flex flex-col gap-3 mt-5 w-full"
-                  key={folder.folder}
-                >
-                  <strong className="font-bold">{folder.folder}</strong>
-                  <ul className="flex flex-col gap-1">
-                    {folder?.posts &&
-                      folder.posts.map((post: Post) => {
-                        const isActive = params?.post?.includes(post.slug)
-                        return (
-                          <li key={post.slug} className="w-full">
-                            <Link
-                              className={`${
-                                isActive ? 'underline' : 'opacity-85'
-                              } hover:opacity-100 transition`}
-                              href={`/posts/${post.path?.join('/')}/${
-                                post.slug
-                              }`}
-                            >
-                              {post.frontmatter?.title || post.title}
-                            </Link>
-                          </li>
-                        )
-                      })}
-                  </ul>
-                </div>
-              )
-            })}
+          <div className="flex flex-col mt-5 w-full">
+            <Tree node={navStructure} params={params} isRoot />
+          </div>
         </div>
       </aside>
       <article className="w-full">{children}</article>
+    </div>
+  )
+}
+
+type PostType = {
+  slug: string
+  title: string
+
+  // Extend with other properties as needed
+}
+
+type TreeNodeType = {
+  name: string
+  children: Map<string, TreeNodeType>
+  posts: PostType[]
+}
+
+const Post: React.FC<{ post: Post; params: { post: string | string[] } }> = ({
+  post,
+  params,
+}) => {
+  const isActive = params?.post?.includes(post.slug)
+
+  return (
+    <li className="w-full">
+      <Link
+        className={`${
+          isActive ? 'underline' : 'opacity-85'
+        } hover:opacity-100 transition`}
+        href={`/posts${post.path}`}
+      >
+        {post.title}
+      </Link>
+      {/* Add more details as needed */}
+    </li>
+  )
+}
+
+const Tree: React.FC<{
+  node: TreeNode
+  isRoot?: boolean
+  params: { post: string | string[] }
+}> = ({ node, isRoot = false, params }) => {
+  return (
+    <div className="flex flex-col w-full">
+      {!isRoot && <strong className="font-bold">{node.name}</strong>}
+      {(node.children.size > 0 || node.posts.length > 0) && (
+        <ul className={!isRoot ? 'ml-2' : 'flex flex-col gap-5'}>
+          {Array.from(node.children.values()).map((child, index) => (
+            <Tree key={index} node={child} params={params} />
+          ))}
+          {node.posts.map((post, index) => (
+            <Post key={index} post={post} params={params} />
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

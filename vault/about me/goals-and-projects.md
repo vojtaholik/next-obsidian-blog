@@ -12,7 +12,7 @@ tags:
   - electronics
   - arduino
 ---
-[[[agar2.jpg]]]
+![[agar2.jpg]]]
 
 Goals & projects in **Genetics & Biology:**
 

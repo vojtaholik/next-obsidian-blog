@@ -66,7 +66,7 @@ const PostPage: React.FC<{
     imagesWithDimensions && (await Promise.all(imagesWithDimensions))
 
   return (
-    <div className="w-full pt-12">
+    <div className="w-full py-5 max-w-4xl mx-auto">
       <h1 className="text-4xl font-bold">{title}</h1>
 
       <div className="prose sm:prose-lg prose-invert w-full max-w-none py-8">
@@ -104,7 +104,7 @@ const PostPage: React.FC<{
 
       {post.backlinks && (
         <div className="py-10 border-t border-gray-800">
-          <strong className="text-lg font-bold">Mentioned in:</strong>
+          <strong className="text-lg font-bold">Referred in</strong>
           <ul className="mt-2 list-disc list-inside">
             {post.backlinks.map((backlink) => (
               <li key={backlink.slug}>

@@ -1,12 +1,17 @@
 import type { Metadata } from 'next'
-import { IBM_Plex_Mono } from 'next/font/google'
+import { IBM_Plex_Mono as FontMono, Inter as FontSans } from 'next/font/google'
 import './globals.css'
 import 'yet-another-react-lightbox/styles.css'
 
-const PlexMono = IBM_Plex_Mono({
+const fontMono = FontMono({
   weight: ['400', '700'],
   display: 'swap',
   subsets: ['latin'],
+})
+
+const fontSans = FontSans({
+  subsets: ['latin'],
+  variable: '--font-sans',
 })
 
 export const metadata: Metadata = {
@@ -21,9 +26,11 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${PlexMono.className} overflow-y-scroll`}>
-        <main className="p-5 mx-auto w-full max-w-screen-lg">{children}</main>
+    <html lang="en" className="dark">
+      <body
+        className={`${fontMono.className} ${fontSans.className} font-sans antialiased overflow-y-scroll`}
+      >
+        <main className="">{children}</main>
       </body>
     </html>
   )

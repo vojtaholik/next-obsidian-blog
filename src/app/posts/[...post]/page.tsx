@@ -8,6 +8,7 @@ import sizeOf from 'image-size'
 import { readFile } from 'fs/promises'
 import type { Props, ScriptProps } from 'next/script'
 import type { Metadata, ResolvingMetadata } from 'next'
+import Link from 'next/link'
 
 export async function generateMetadata(
   { params }: { params: { post: string | string[] } },
@@ -67,6 +68,7 @@ const PostPage: React.FC<{
   return (
     <div className="w-full pt-12">
       <h1 className="text-4xl font-bold">{title}</h1>
+
       <div className="prose sm:prose-lg prose-invert w-full max-w-none py-8">
         <MDXRemote
           components={{
@@ -99,6 +101,24 @@ const PostPage: React.FC<{
           }}
         />
       </div>
+
+      {post.backlinks && (
+        <div className="py-10 border-t border-gray-800">
+          <strong className="text-lg font-bold">Mentioned in:</strong>
+          <ul className="mt-2 list-disc list-inside">
+            {post.backlinks.map((backlink) => (
+              <li key={backlink.slug}>
+                <Link
+                  className="hover:underline"
+                  href={`/posts/${backlink.slug}`}
+                >
+                  {backlink.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }

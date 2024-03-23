@@ -5,6 +5,16 @@ export const PostSchema = z.object({
   title: z.string(),
   content: z.string(),
   path: z.array(z.string()).optional().nullable(),
+  backlinks: z
+    .array(
+      z.object({
+        title: z.string(),
+        slug: z.string(),
+        path: z.array(z.string()).optional().nullable(),
+      })
+    )
+    .optional()
+    .nullable(),
   frontmatter: z
     .object({
       title: z.string().nullable().optional(),

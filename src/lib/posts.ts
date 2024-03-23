@@ -4,6 +4,7 @@ import { compileMDX } from 'next-mdx-remote/rsc'
 import slugify from '@sindresorhus/slugify'
 import path from 'path'
 import fs from 'fs/promises'
+import { parseBacklinks } from '@/utils/parse-backlinks'
 
 export async function getPosts() {
   const files = await glob(
@@ -26,7 +27,7 @@ export async function getPosts() {
       const post = {
         slug: slugify(title),
         title,
-        content: await parseObsidianContent(content),
+        content, // : await parseObsidianContent(content),
         frontmatter,
         path: filepath
           .replace(pathStringToReplace, '')
@@ -39,19 +40,18 @@ export async function getPosts() {
     })
   )
 
-  const orderedPosts = posts.sort((a, b) => {
-    return a.path.join('/').localeCompare(b.path.join('/'))
+  const postsWithBacklinks = await parseBacklinks(posts as Post[])
+  const parseObsidianContent = await parseObsidianContentForPosts(
+    postsWithBacklinks
+  )
+
+  const orderedPosts = parseObsidianContent.sort((a, b) => {
+    return a?.path && b?.path
+      ? a?.path.join('/').localeCompare(b?.path.join('/'))
+      : 0
   })
 
   return orderedPosts as Post[]
-}
-
-const parseObsidianContent = async (content: string) => {
-  // replace obsidian's image markup ![[image.png]] with standard html image tag
-  const imgRegex = /!\[\[(.*?)\]\]/g
-  const imgTag = `![/images/$1](/images/$1)`
-  content = content.replace(imgRegex, imgTag)
-  return content
 }
 
 export async function getPost(
@@ -80,4 +80,26 @@ export async function getPost(
 
     return post
   }
+}
+
+const parseObsidianContentForPosts = async (posts: Post[]): Promise<Post[]> => {
+  return posts.map((post) => {
+    let { content } = post
+
+    // Replace obsidian's image markup ![[image.png]] with standard markdown image tag
+    const imgRegex = /!\[\[(.*?)\]\]/g
+    const imgTag = `![/images/$1](/images/$1)`
+    content = content.replace(imgRegex, imgTag)
+
+    // Replace [[wikilinks]] with markdown links
+    const backlinkRegex = /\[\[(.*?)\]\]/g
+    const linkTag = `[$1](/posts/$1)`
+    content = content.replace(backlinkRegex, linkTag)
+
+    // Return the post with updated content
+    return {
+      ...post,
+      content,
+    }
+  })
 }

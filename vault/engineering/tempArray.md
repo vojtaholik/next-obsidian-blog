@@ -13,6 +13,8 @@ tags:
 ---
 This one is simple. I wanted to measure multi-point temp readings from every reaction I make so I can see how cooling works, set alarms for certain temperatures etc.
 
+[[laminar-flow-hood]]
+
 <Grid>
 
 ![[ch1.jpg]]
